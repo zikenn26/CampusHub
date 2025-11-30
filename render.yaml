@@ -1,0 +1,41 @@
+services:
+  - type: web
+    name: campus-hub
+    env: python
+    buildCommand: pip install -r requirements.txt && python manage.py collectstatic --noinput && python manage.py migrate
+    startCommand: gunicorn campus_hub.wsgi:application --bind 0.0.0.0:$PORT
+    envVars:
+      - key: SECRET_KEY
+        sync: false
+      - key: DEBUG
+        value: False
+      - key: DB_NAME
+        fromDatabase:
+          name: campus-hub-db
+          property: database
+      - key: DB_USER
+        fromDatabase:
+          name: campus-hub-db
+          property: user
+      - key: DB_PASSWORD
+        fromDatabase:
+          name: campus-hub-db
+          property: password
+      - key: DB_HOST
+        fromDatabase:
+          name: campus-hub-db
+          property: host
+      - key: DB_PORT
+        fromDatabase:
+          name: campus-hub-db
+          property: port
+      - key: ALLOWED_HOSTS
+        sync: false
+      - key: CSRF_TRUSTED_ORIGINS
+        sync: false
+
+databases:
+  - name: campus-hub-db
+    databaseName: campus_hub
+    user: campus_hub_user
+

@@ -1,0 +1,53 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Top Materials - Analytics - Campus Hub{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1>Top Materials Analytics</h1>
+    
+    <div class="analytics-nav">
+        <a href="{% url 'analytics_search_terms' %}" class="analytics-link">View Search Analytics →</a>
+    </div>
+    
+    <p class="analytics-description">
+        Top 20 study materials ranked by total engagement (downloads + views + favorites × 2).
+    </p>
+    
+    {% if materials %}
+        <div class="table-wrapper">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Rank</th>
+                        <th>Title</th>
+                        <th>Department</th>
+                        <th>Views</th>
+                        <th>Downloads</th>
+                        <th>Favorites</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for material in materials %}
+                    <tr>
+                        <td>{{ material.rank }}</td>
+                        <td>
+                            <a href="{% url 'material_detail' material.pk %}">
+                                {{ material.title }}
+                            </a>
+                        </td>
+                        <td>{{ material.department.short_code }}</td>
+                        <td>{{ material.views_count }}</td>
+                        <td>{{ material.downloads_count }}</td>
+                        <td>{{ material.favorites_count }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <p class="no-data">No materials found.</p>
+    {% endif %}
+</div>
+{% endblock %}
+

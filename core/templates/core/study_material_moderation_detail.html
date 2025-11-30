@@ -1,0 +1,144 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Moderate: {{ material.title }} - Campus Hub{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1>Moderate: {{ material.title }}</h1>
+    
+    <div class="back-link">
+        <a href="{% url 'material_moderation_list' %}">← Back to Moderation Queue</a>
+    </div>
+    
+    <section class="material-info">
+        <h2>Material Information</h2>
+        <p><strong>Department:</strong> 
+            <a href="{% url 'department_detail' material.department.pk %}">
+                {{ material.department.name }} ({{ material.department.short_code }})
+            </a>
+        </p>
+        <p><strong>Title:</strong> {{ material.title }}</p>
+        <p><strong>Semester:</strong> {{ material.semester }}</p>
+        <p><strong>Year:</strong> {{ material.year }}</p>
+        <p><strong>File Type:</strong> {{ material.get_file_type_display }}</p>
+        
+        {% if material.description %}
+            <div class="description-section">
+                <h3>Description</h3>
+                <p>{{ material.description }}</p>
+            </div>
+        {% endif %}
+        
+        {% if material.file_drive_id %}
+            <div class="file-section">
+                <h3>File / Link ID</h3>
+                {% if material.file_drive_id|slice:":4" == "http" %}
+                    <p><a href="{{ material.file_drive_id }}" target="_blank" rel="noopener noreferrer">
+                        {{ material.file_drive_id }}
+                    </a></p>
+                {% else %}
+                    <p><code>{{ material.file_drive_id }}</code></p>
+                {% endif %}
+            </div>
+        {% endif %}
+        
+        {% if material.subject_tags %}
+            <div class="tags-section">
+                <h3>Subject Tags</h3>
+                <ul class="tags-list">
+                    {% for tag in material.subject_tags %}
+                        <li class="tag">{{ tag }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        {% endif %}
+        
+        <div class="upload-info">
+            <h3>Upload Information</h3>
+            <p><strong>Uploaded by:</strong> {{ material.uploader_user.name }} ({{ material.uploader_user.email }})</p>
+            <p><strong>Uploaded at:</strong> {{ material.uploaded_at|date:"F d, Y H:i" }}</p>
+            <p><strong>Current Status:</strong> 
+                <span class="status-badge status-{{ material.verification_status }}">
+                    {{ material.get_verification_status_display }}
+                </span>
+            </p>
+            {% if material.verifier %}
+                <p><strong>Verified by:</strong> {{ material.verifier.name }}</p>
+            {% endif %}
+            {% if material.verified_at %}
+                <p><strong>Verified at:</strong> {{ material.verified_at|date:"F d, Y H:i" }}</p>
+            {% endif %}
+        </div>
+    </section>
+    
+    <section class="audit-history">
+        <h2>Audit History</h2>
+        {% if audit_logs %}
+            <table class="audit-table">
+                <thead>
+                    <tr>
+                        <th>Action</th>
+                        <th>User</th>
+                        <th>Timestamp</th>
+                        <th>Reason</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for log in audit_logs %}
+                    <tr>
+                        <td>
+                            <span class="action-badge action-{{ log.action }}">
+                                {{ log.get_action_display }}
+                            </span>
+                        </td>
+                        <td>{{ log.uploader.name }}</td>
+                        <td>{{ log.timestamp|date:"M d, Y H:i" }}</td>
+                        <td>{{ log.reason|default:"—" }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <p>No audit history available.</p>
+        {% endif %}
+    </section>
+    
+    <section class="moderation-action">
+        <h2>Moderation Action</h2>
+        <form method="post" class="moderation-form">
+            {% csrf_token %}
+            
+            {% if form.non_field_errors %}
+                <div class="error-list">
+                    {{ form.non_field_errors }}
+                </div>
+            {% endif %}
+            
+            <div class="form-field">
+                <label for="{{ form.action.id_for_label }}">{{ form.action.label }}:</label>
+                {{ form.action }}
+                {% if form.action.errors %}
+                    <div class="field-errors">{{ form.action.errors }}</div>
+                {% endif %}
+            </div>
+            
+            <div class="form-field">
+                <label for="{{ form.reason.id_for_label }}">{{ form.reason.label }}:</label>
+                {{ form.reason }}
+                {% if form.reason.help_text %}
+                    <small class="help-text">{{ form.reason.help_text }}</small>
+                {% endif %}
+                {% if form.reason.errors %}
+                    <div class="field-errors">{{ form.reason.errors }}</div>
+                {% endif %}
+            </div>
+            
+            <div class="form-actions">
+                <button type="submit" class="submit-btn">Apply Action</button>
+                <a href="{% url 'material_moderation_list' %}" class="cancel-btn">Cancel</a>
+            </div>
+        </form>
+    </section>
+</div>
+{% endblock %}
+

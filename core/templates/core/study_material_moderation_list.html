@@ -1,0 +1,91 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Moderation Queue - Campus Hub{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1>Moderation Queue</h1>
+    
+    <div class="moderation-note">
+        <p><strong>Note:</strong> This page is only visible to verifiers (staff, superusers, and coordinators).</p>
+    </div>
+    
+    <section class="filter-section">
+        <form method="get" action="{% url 'material_moderation_list' %}">
+            <div class="filter-form">
+                <div class="filter-field">
+                    <label for="status">Status:</label>
+                    <select name="status" id="status">
+                        <option value="all" {% if current_status == 'all' or not current_status %}selected{% endif %}>All</option>
+                        <option value="pending" {% if current_status == 'pending' %}selected{% endif %}>Pending</option>
+                        <option value="approved" {% if current_status == 'approved' %}selected{% endif %}>Approved</option>
+                        <option value="rejected" {% if current_status == 'rejected' %}selected{% endif %}>Rejected</option>
+                    </select>
+                </div>
+                
+                <div class="filter-field">
+                    <label for="department">Department:</label>
+                    <select name="department" id="department">
+                        <option value="">All Departments</option>
+                        {% for dept in departments %}
+                            <option value="{{ dept.pk }}" 
+                                {% if current_department_id == dept.pk|stringformat:"s" %}selected{% endif %}>
+                                {{ dept.name }} ({{ dept.short_code }})
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <div class="filter-field">
+                    <button type="submit">Filter</button>
+                    <a href="{% url 'material_moderation_list' %}" class="clear-filter">Clear</a>
+                </div>
+            </div>
+        </form>
+    </section>
+    
+    <section class="materials-section">
+        {% if materials %}
+            <div class="table-wrapper">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Title</th>
+                            <th>Department</th>
+                            <th>Semester</th>
+                            <th>Year</th>
+                            <th>Uploader</th>
+                            <th>Status</th>
+                            <th>Uploaded At</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for material in materials %}
+                        <tr>
+                            <td>
+                                <a href="{% url 'material_moderation_detail' material.pk %}">
+                                    {{ material.title }}
+                                </a>
+                            </td>
+                            <td>{{ material.department.short_code }}</td>
+                            <td>{{ material.semester }}</td>
+                            <td>{{ material.year }}</td>
+                            <td>{{ material.uploader_user.name }}<br><small>{{ material.uploader_user.email }}</small></td>
+                            <td>
+                                <span class="status-badge status-{{ material.verification_status }}">
+                                    {{ material.get_verification_status_display }}
+                                </span>
+                            </td>
+                            <td>{{ material.uploaded_at|date:"M d, Y H:i" }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <p>No materials found matching the filters.</p>
+        {% endif %}
+    </section>
+</div>
+{% endblock %}
+

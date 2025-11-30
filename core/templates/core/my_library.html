@@ -1,0 +1,101 @@
+{% extends 'core/base.html' %}
+
+{% block title %}My Library - Campus Hub{% endblock %}
+
+{% block content %}
+<section class="page-header">
+    <div>
+        <h1 class="page-title">My Library</h1>
+        <p class="page-subtitle">
+            Saved and recently viewed materials in your account.
+        </p>
+    </div>
+</section>
+
+<section class="library-grid">
+    <div class="card-soft">
+        <h2 style="font-size: 0.95rem; margin-bottom: 0.8rem; color: var(--text-soft); font-weight: 600;">Favorites</h2>
+        {% if favorite_entries %}
+            <div class="table-wrapper" style="margin-top: 0;">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Title</th>
+                            <th>Department</th>
+                            <th>Semester</th>
+                            <th>Uploaded</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for entry in favorite_entries %}
+                            <tr>
+                                <td>
+                                    <a href="{% url 'material_detail' entry.material.pk %}">
+                                        {{ entry.material.title }}
+                                    </a>
+                                </td>
+                                <td>{{ entry.material.department.short_code }}</td>
+                                <td>{{ entry.material.semester }}</td>
+                                <td>{{ entry.material.uploaded_at|date:"M d, Y" }}</td>
+                                <td>
+                                    <span class="status-badge status-{{ entry.material.verification_status }}">
+                                        {{ entry.material.get_verification_status_display }}
+                                    </span>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <p class="no-data" style="padding: 1.5rem; text-align: center; color: var(--text-muted); font-style: italic;">
+                No favorites yet. Save materials from the Study Hub to see them here.
+            </p>
+        {% endif %}
+    </div>
+
+    <div class="card-soft">
+        <h2 style="font-size: 0.95rem; margin-bottom: 0.8rem; color: var(--text-soft); font-weight: 600;">Recently Viewed</h2>
+        {% if recent_entries %}
+            <div class="table-wrapper" style="margin-top: 0;">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Title</th>
+                            <th>Department</th>
+                            <th>Semester</th>
+                            <th>Last Viewed</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for entry in recent_entries %}
+                            <tr>
+                                <td>
+                                    <a href="{% url 'material_detail' entry.material.pk %}">
+                                        {{ entry.material.title }}
+                                    </a>
+                                </td>
+                                <td>{{ entry.material.department.short_code }}</td>
+                                <td>{{ entry.material.semester }}</td>
+                                <td>{{ entry.last_viewed_at|date:"M d, Y H:i" }}</td>
+                                <td>
+                                    <span class="status-badge status-{{ entry.material.verification_status }}">
+                                        {{ entry.material.get_verification_status_display }}
+                                    </span>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <p class="no-data" style="padding: 1.5rem; text-align: center; color: var(--text-muted); font-style: italic;">
+                No recent views yet. Browse materials from the Study Hub to see them here.
+            </p>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}
+

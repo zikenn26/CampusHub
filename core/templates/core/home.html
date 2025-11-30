@@ -1,0 +1,111 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Dashboard · Campus Hub{% endblock %}
+
+{% block content %}
+<section class="page-header">
+    <div>
+        <h1 class="page-title">Welcome to Campus Hub</h1>
+        <p class="page-subtitle">
+            Browse departments, faculty, timetables, and verified study materials from one place.
+        </p>
+    </div>
+    <div>
+        {% if user.is_authenticated %}
+            <a href="{% url 'material_upload' %}" class="btn btn-primary">
+                Upload material
+            </a>
+        {% endif %}
+    </div>
+</section>
+
+<section class="card-grid" style="margin-bottom: 1.4rem;">
+    <div class="card">
+        <div class="card-title">Departments</div>
+        <div class="card-value">{{ departments|length }}</div>
+        <div class="page-subtitle" style="margin-top: 0.2rem;">
+            Explore department info and coordinators.
+        </div>
+    </div>
+
+    <div class="card-soft">
+        <div class="card-title">Recently added materials</div>
+        <div class="card-value">{{ recent_materials|length }}</div>
+        <div class="page-subtitle" style="margin-top: 0.2rem;">
+            Latest uploads in the Study Hub.
+        </div>
+    </div>
+
+    <div class="card-soft">
+        <div class="card-title">Quick access</div>
+        <div style="margin-top: 0.5rem; display: flex; flex-direction: column; gap: 0.35rem;">
+            <a href="{% url 'timetable_list' %}" class="download-link">View timetable</a>
+            <a href="{% url 'material_list' %}" class="download-link">Browse Study Hub</a>
+        </div>
+    </div>
+</section>
+
+<section style="display: grid; grid-template-columns: minmax(0, 2.1fr) minmax(0, 1.4fr); gap: 1.1rem; overflow: hidden;">
+    <div class="card-soft">
+        <h2 style="font-size: 0.95rem; margin-bottom: 0.8rem;">Recent materials</h2>
+        {% if recent_materials %}
+            <div class="table-wrapper" style="margin-top: 0;">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Title</th>
+                            <th>Department</th>
+                            <th>Semester</th>
+                            <th>Uploaded</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for m in recent_materials %}
+                            <tr>
+                                <td>
+                                    <a href="{% url 'material_detail' m.pk %}">
+                                        {{ m.title }}
+                                    </a>
+                                </td>
+                                <td>{{ m.department.short_code }}</td>
+                                <td>{{ m.semester }}</td>
+                                <td>{{ m.uploaded_at|date:"M d" }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <p class="page-subtitle">No materials uploaded yet.</p>
+        {% endif %}
+    </div>
+
+    <div class="card-soft">
+        <h2 style="font-size: 0.95rem; margin-bottom: 0.8rem;">Departments</h2>
+        {% if departments %}
+            <ul style="list-style: none; display: flex; flex-direction: column; gap: 0.35rem; font-size: 0.86rem;">
+                {% for dept in departments|slice:":6" %}
+                    <li style="display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <div>{{ dept.name }}</div>
+                            <div style="font-size: 0.78rem; color: #9ca3af;">
+                                {{ dept.short_code }}
+                            </div>
+                        </div>
+                        <a href="{% url 'department_detail' dept.pk %}" class="download-link">
+                            View
+                        </a>
+                    </li>
+                {% endfor %}
+            </ul>
+            {% if departments|length > 6 %}
+                <p class="page-subtitle" style="margin-top: 0.6rem;">
+                    <a href="{% url 'department_list' %}">View all departments</a>
+                </p>
+            {% endif %}
+        {% else %}
+            <p class="page-subtitle">No departments configured yet.</p>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}

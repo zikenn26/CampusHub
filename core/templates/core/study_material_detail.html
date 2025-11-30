@@ -1,0 +1,136 @@
+{% extends 'core/base.html' %}
+
+{% block title %}{{ material.title }} - Study Material - Campus Hub{% endblock %}
+
+{% block content %}
+<div class="container material-detail">
+    <div class="material-header">
+        <h1>{{ material.title }}</h1>
+        {% if user.is_authenticated %}
+            <form method="post" action="{% url 'material_toggle_favorite' material.pk %}" class="favorite-form">
+                {% csrf_token %}
+                <button type="submit" class="favorite-btn {% if is_favorite %}favorite-active{% endif %}" title="{% if is_favorite %}Remove from favorites{% else %}Add to favorites{% endif %}">
+                    {% if is_favorite %}
+                        ⭐ Saved
+                    {% else %}
+                        ☆ Save
+                    {% endif %}
+                </button>
+            </form>
+        {% endif %}
+    </div>
+
+    <section class="material-meta">
+        <p>
+            <strong>Department:</strong>
+            <a href="{% url 'department_detail' material.department.pk %}">
+                {{ material.department.name }} ({{ material.department.short_code }})
+            </a>
+        </p>
+
+        {% if material.semester %}
+            <p><strong>Semester:</strong> {{ material.semester }}</p>
+        {% endif %}
+
+        {% if material.year %}
+            <p><strong>Year:</strong> {{ material.year }}</p>
+        {% endif %}
+
+        {% if material.subject_tags %}
+            <p>
+                <strong>Subjects:</strong>
+                {% for tag in material.subject_tags %}
+                    <span class="tag-badge">{{ tag }}</span>
+                {% endfor %}
+            </p>
+        {% endif %}
+
+        <p>
+            <strong>Status:</strong>
+            <span class="status-badge status-{{ material.verification_status }}">
+                {{ material.get_verification_status_display }}
+            </span>
+        </p>
+
+        <p>
+            <strong>Views:</strong> {{ material.views_count }}
+            &nbsp;|&nbsp;
+            <strong>Downloads:</strong> {{ material.downloads_count }}
+        </p>
+
+        <p>
+            <strong>Uploaded by:</strong>
+            {% if material.uploader_user %}
+                {{ material.uploader_user.get_full_name|default:material.uploader_user.username }}
+            {% else %}
+                Anonymous
+            {% endif %}
+            on {{ material.uploaded_at|date:"M d, Y H:i" }}
+        </p>
+
+        {% if material.verifier %}
+            <p>
+                <strong>Verified by:</strong>
+                {{ material.verifier.get_full_name|default:material.verifier.username }}
+                {% if material.verified_at %}
+                    on {{ material.verified_at|date:"M d, Y H:i" }}
+                {% endif %}
+            </p>
+        {% endif %}
+    </section>
+
+    {% if material.description %}
+        <section class="material-description">
+            <h2>Description</h2>
+            <p>{{ material.description }}</p>
+        </section>
+    {% endif %}
+    {# ===== Preview section (always try to show something if file_drive_id exists) ===== #}
+    {% if material.file_drive_id %}
+        <section class="material-preview">
+            <h2>Preview</h2>
+            {% with url=material.file_drive_id %}
+                {# For full URLs, embed them as read-only preview #}
+                {% if url|slice:":4" == "http" %}
+                    <iframe
+                        src="{{ url }}"
+                        class="material-preview-frame"
+                        frameborder="0"
+                        allowfullscreen
+                        sandbox="allow-same-origin allow-scripts"
+                    ></iframe>
+                {% else %}
+                    {# For Google Drive file IDs, use the preview endpoint #}
+                    <iframe
+                        src="https://drive.google.com/file/d/{{ url }}/preview"
+                        class="material-preview-frame"
+                        frameborder="0"
+                        allowfullscreen
+                        sandbox="allow-same-origin allow-scripts"
+                    ></iframe>
+                {% endif %}
+            {% endwith %}
+        </section>
+    {% endif %}
+
+
+    {# ===== Download / access section (tracks downloads) ===== #}
+    {% if material.file_drive_id %}
+        <section class="file-section">
+            <h2>Download / Access</h2>
+            <p>
+                <a href="{% url 'material_download' material.pk %}"
+                   target="_blank"
+                   rel="noopener noreferrer"
+                   class="download-link">
+                    Download / View File →
+                </a>
+            </p>
+        </section>
+    {% endif %}
+
+    <section class="material-extra">
+        <p><a href="{% url 'material_list' %}">← Back to Study Hub</a></p>
+    </section>
+</div>
+{% endblock %}

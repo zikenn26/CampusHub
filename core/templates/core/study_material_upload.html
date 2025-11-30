@@ -1,0 +1,44 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Upload Study Material - Campus Hub{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1>Upload Study Material</h1>
+    
+    <div class="upload-info-box">
+        <p><strong>Note:</strong> The "File / link ID" field currently accepts a URL or any ID. 
+        Google Drive integration will be added in a future update.</p>
+    </div>
+    
+    <form method="post" class="upload-form">
+        {% csrf_token %}
+        
+        {% if form.non_field_errors %}
+            <div class="error-list">
+                {{ form.non_field_errors }}
+            </div>
+        {% endif %}
+        
+        {{ form.as_p }}
+        
+        {% if form.errors %}
+            <div class="error-list">
+                <ul>
+                    {% for field in form %}
+                        {% for error in field.errors %}
+                            <li><strong>{{ field.label }}:</strong> {{ error }}</li>
+                        {% endfor %}
+                    {% endfor %}
+                </ul>
+            </div>
+        {% endif %}
+        
+        <div class="form-actions">
+            <button type="submit" class="submit-btn">Upload Material</button>
+            <a href="{% url 'material_list' %}" class="cancel-btn">Cancel</a>
+        </div>
+    </form>
+</div>
+{% endblock %}
+

@@ -1,0 +1,54 @@
+{% extends 'core/base.html' %}
+
+{% block title %}{{ department.name }} - Campus Hub{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1>{{ department.name }} ({{ department.short_code }})</h1>
+    
+    <section class="department-info">
+        {% if department.description %}
+            <p><strong>Description:</strong> {{ department.description }}</p>
+        {% endif %}
+        
+        {% if department.contact_emails %}
+            <p><strong>Contact Emails:</strong> 
+                {{ department.contact_emails|join:", " }}
+            </p>
+        {% endif %}
+    </section>
+    
+    <section class="faculty-section">
+        <h2>Faculty in this Department</h2>
+        {% if faculty_list %}
+            <ul class="faculty-list">
+                {% for faculty in faculty_list %}
+                <li>
+                    <a href="{% url 'faculty_detail' faculty.pk %}">
+                        <strong>{{ faculty.name }}</strong>
+                        {% if faculty.title %} - {{ faculty.title }}{% endif %}
+                    </a>
+                </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>No faculty members in this department.</p>
+        {% endif %}
+    </section>
+    
+    <section class="study-materials-section">
+        <h2>Study Materials for this Department</h2>
+        <p><em>Coming soon...</em></p>
+    </section>
+    
+    <section class="timetable-section">
+        <h2>Timetable for this Department</h2>
+        <p>
+            <a href="{% url 'department_timetable' department.pk %}" class="timetable-link">
+                View full timetable →
+            </a>
+        </p>
+    </section>
+</div>
+{% endblock %}
+

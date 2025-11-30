@@ -1,0 +1,63 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Faculty - Campus Hub{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1>Faculty</h1>
+    
+    <section class="filter-section">
+        <form method="get" action="{% url 'faculty_list' %}">
+            <label for="department">Filter by Department:</label>
+            <select name="department" id="department">
+                <option value="">All Departments</option>
+                {% for dept in departments %}
+                    <option value="{{ dept.pk }}" 
+                        {% if request.GET.department == dept.pk|stringformat:"s" %}selected{% endif %}>
+                        {{ dept.name }} ({{ dept.short_code }})
+                    </option>
+                {% endfor %}
+            </select>
+            <button type="submit">Filter</button>
+        </form>
+    </section>
+    
+    <section class="faculty-list-section">
+        {% if faculty_list %}
+            <div class="table-wrapper">
+                <table class="faculty-table">
+                    <thead>
+                        <tr>
+                            <th>Photo</th>
+                            <th>Name</th>
+                            <th>Title</th>
+                            <th>Department</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for faculty in faculty_list %}
+                        <tr>
+                            <td class="faculty-avatar-cell">
+                                {% if faculty.photo_url %}
+                                    <img src="{{ faculty.photo_url }}" alt="{{ faculty.name }}" class="faculty-avatar">
+                                {% endif %}
+                            </td>
+                            <td>
+                                <a href="{% url 'faculty_detail' faculty.pk %}">
+                                    <strong>{{ faculty.name }}</strong>
+                                </a>
+                            </td>
+                            <td>{% if faculty.title %}{{ faculty.title }}{% else %}—{% endif %}</td>
+                            <td>{{ faculty.department.short_code }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <p>No faculty members found.</p>
+        {% endif %}
+    </section>
+</div>
+{% endblock %}
+

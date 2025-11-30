@@ -1,0 +1,89 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Study Materials - Campus Hub{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1>Study Materials</h1>
+    
+    <section class="filter-section">
+        <form method="get" action="{% url 'material_list' %}">
+            <div class="filter-form">
+                <div class="filter-field">
+                    <label for="department">Department:</label>
+                    <select name="department" id="department">
+                        <option value="">All Departments</option>
+                        {% for dept in departments %}
+                            <option value="{{ dept.pk }}" 
+                                {% if request.GET.department == dept.pk|stringformat:"s" %}selected{% endif %}>
+                                {{ dept.name }} ({{ dept.short_code }})
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <div class="filter-field">
+                    <label for="semester">Semester:</label>
+                    <input type="number" name="semester" id="semester" 
+                        value="{{ request.GET.semester }}" min="1" max="12">
+                </div>
+                
+                <div class="filter-field">
+                    <label for="year">Year:</label>
+                    <input type="number" name="year" id="year" 
+                        value="{{ request.GET.year }}" min="2000" max="2100">
+                </div>
+                
+                <div class="filter-field">
+                    <button type="submit">Filter</button>
+                    <a href="{% url 'material_list' %}" class="clear-filter">Clear</a>
+                </div>
+            </div>
+        </form>
+    </section>
+    
+    <section class="materials-section">
+        {% if materials %}
+            <div class="table-wrapper">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Title</th>
+                            <th>Department</th>
+                            <th>Semester</th>
+                            <th>Year</th>
+                            {% if user.is_staff or user.is_superuser %}
+                                <th>Status</th>
+                            {% endif %}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for material in materials %}
+                        <tr>
+                            <td>
+                                <a href="{% url 'material_detail' material.pk %}">
+                                    {{ material.title }}
+                                </a>
+                            </td>
+                            <td>{{ material.department.short_code }}</td>
+                            <td>{{ material.semester }}</td>
+                            <td>{{ material.year }}</td>
+                            {% if user.is_staff or user.is_superuser %}
+                                <td>
+                                    <span class="status-badge status-{{ material.verification_status }}">
+                                        {{ material.get_verification_status_display }}
+                                    </span>
+                                </td>
+                            {% endif %}
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <p>No study materials found.</p>
+        {% endif %}
+    </section>
+</div>
+{% endblock %}
+

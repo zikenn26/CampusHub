@@ -1,0 +1,14 @@
+# Copy this file to .env and fill in your values
+# DO NOT commit .env to version control
+
+# Django Settings
+SECRET_KEY=django-insecure-change-this-to-a-random-secret-key-in-production
+DEBUG=True
+
+# MySQL Database Configuration
+DB_NAME=campus_hub
+DB_USER=root
+DB_PASSWORD=your-mysql-password-here
+DB_HOST=localhost
+DB_PORT=3306
+

@@ -1,0 +1,60 @@
+{% extends 'core/base.html' %}
+
+{% block title %}{{ faculty.name }} - Faculty - Campus Hub{% endblock %}
+
+{% block content %}
+<div class="container faculty-detail">
+    <h1>{{ faculty.name }}</h1>
+    
+    <p class="faculty-title">
+        {% if faculty.title %}{{ faculty.title }}{% endif %}
+        {% if faculty.department %} · {{ faculty.department.short_code }}{% endif %}
+    </p>
+    
+    <div class="faculty-layout">
+        <div class="faculty-photo">
+            {% if faculty.photo_url %}
+                <img src="{{ faculty.photo_url }}" alt="{{ faculty.name }}">
+            {% else %}
+                <div class="faculty-photo-placeholder">
+                    No photo available
+                </div>
+            {% endif %}
+        </div>
+        
+        <div class="faculty-info">
+            {% if faculty.biography %}
+                <h2>Biography</h2>
+                <p>{{ faculty.biography }}</p>
+            {% endif %}
+            
+            {% if faculty.research_interests %}
+                <h2>Research Interests</h2>
+                <p>{{ faculty.research_interests }}</p>
+            {% endif %}
+            
+            <h2>Contact</h2>
+            <ul class="contact-list">
+                {% if faculty.contact_email %}
+                    <li>Email: <a href="mailto:{{ faculty.contact_email }}">{{ faculty.contact_email }}</a></li>
+                {% endif %}
+                {% if faculty.phone %}
+                    <li>Phone: {{ faculty.phone }}</li>
+                {% endif %}
+                {% if faculty.office_hours %}
+                    <li>Office hours: {{ faculty.office_hours }}</li>
+                {% endif %}
+            </ul>
+            
+            <p><strong>Status:</strong> {{ faculty.get_status_display }}</p>
+            
+            <p class="faculty-note">
+                <small>Note: Photo must be a public image URL (for example, an open image link or a Google Drive image with public access).</small>
+            </p>
+        </div>
+    </div>
+    
+    <p><a href="{% url 'department_detail' faculty.department.pk %}">← Back to department</a></p>
+</div>
+{% endblock %}
+

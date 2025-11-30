@@ -1,0 +1,43 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Search Analytics - Campus Hub{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1>Search Analytics</h1>
+    
+    <div class="analytics-nav">
+        <a href="{% url 'analytics_top_materials' %}" class="analytics-link">View Top Materials →</a>
+    </div>
+    
+    <p class="analytics-description">
+        Top 50 most frequently searched terms.
+    </p>
+    
+    {% if search_terms %}
+        <div class="table-wrapper">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Query</th>
+                        <th>Count</th>
+                        <th>Last Searched At</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for term in search_terms %}
+                    <tr>
+                        <td>{{ term.query }}</td>
+                        <td>{{ term.count }}</td>
+                        <td>{{ term.last_searched|date:"M d, Y H:i" }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <p class="no-data">No search queries found.</p>
+    {% endif %}
+</div>
+{% endblock %}
+

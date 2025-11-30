@@ -1,0 +1,65 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Timetable - {{ department.name }} - Campus Hub{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1>Timetable – {{ department.name }}</h1>
+    
+    <div class="back-link">
+        <a href="{% url 'department_detail' department.pk %}">← Back to {{ department.name }}</a>
+    </div>
+    
+    <section class="filter-section">
+        <form method="get" action="{% url 'department_timetable' department.pk %}">
+            <div class="filter-form">
+                <div class="filter-field">
+                    <label for="semester">Semester:</label>
+                    <input type="number" name="semester" id="semester" 
+                        value="{% if selected_semester %}{{ selected_semester }}{% endif %}" 
+                        min="1" max="12" placeholder="All semesters">
+                </div>
+                
+                <div class="filter-field">
+                    <button type="submit">Filter</button>
+                    <a href="{% url 'department_timetable' department.pk %}" class="clear-filter">Clear</a>
+                </div>
+            </div>
+        </form>
+    </section>
+    
+    <section class="timetable-section">
+        {% if entries %}
+            <table class="timetable-table">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Time</th>
+                        <th>Semester</th>
+                        <th>Course Code</th>
+                        <th>Course Name</th>
+                        <th>Venue</th>
+                        <th>Instructor</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for entry in entries %}
+                    <tr>
+                        <td>{{ entry.date|date:"M d, Y" }}</td>
+                        <td>{{ entry.start_time|time:"H:i" }} - {{ entry.end_time|time:"H:i" }}</td>
+                        <td>{{ entry.semester }}</td>
+                        <td>{{ entry.course_code }}</td>
+                        <td>{{ entry.course_name }}</td>
+                        <td>{{ entry.venue }}</td>
+                        <td>{% if entry.instructor %}{{ entry.instructor.name }}{% else %}TBA{% endif %}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <p class="no-entries">No timetable entries found for this department{% if selected_semester %} and semester {{ selected_semester }}{% endif %}.</p>
+        {% endif %}
+    </section>
+</div>
+{% endblock %}
+
