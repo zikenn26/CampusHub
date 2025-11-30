@@ -141,6 +141,19 @@ STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
+# Tell Django to trust the proxy (Railway) for HTTPS
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
+# Production Security Settings
+# These are automatically applied when DEBUG is False
+if not DEBUG:
+    # SSL/HTTPS Security
+    SECURE_SSL_REDIRECT = True
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+    ...
+
+
 # Production Security Settings
 # These are automatically applied when DEBUG is False
 if not DEBUG:
